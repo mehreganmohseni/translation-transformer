@@ -1,0 +1,95 @@
+{
+  "device": "cuda",
+  "num_parameters": 29198336,
+  "total_training_time_seconds": 2583.3218088150024,
+  "best_val_loss": 6.060528257515477,
+  "best_val_perplexity": 428.601806640625,
+  "test_bleu": 1.1331809873459278,
+  "sample_translations": [
+    {
+      "reference": " 28-Year-Old Chef Found Dead at San Francisco Mall",
+      "hypothesis": " Bououwa-fireturn in the region of the CFSP in CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF."
+    },
+    {
+      "reference": " A 28-year-old chef who had recently moved to San Francisco was found dead in the stairwell of a local mall this week.",
+      "hypothesis": " A number of a few days ago, the Bay of a cy, the Bay, the Bay, the Bay, the Bay, the Bay, the Bay, the Bay, the Bay, the Bay, the Bay, was was was made by the Bay."
+    },
+    {
+      "reference": " But the victim's brother says he can't think of anyone who would want to hurt him, saying, \"Things were finally going well for him.\"",
+      "hypothesis": " The French Presidency, Mr President, is that it is the case that it is the 'crerererererererererererererere, who would be able to say 'crererererererererererererererere, to the Bracrerererere, who would be able to take the fact that he can be able to take the fact that he can be able to take the same time to be the case."
+    },
+    {
+      "reference": " The body found at the Westfield Mall Wednesday morning was identified as 28-year-old San Francisco resident Frank Galicia, the San Francisco Medical Examiner's Office said.",
+      "hypothesis": " The French French Minister, was the most recent years ago, which was the most recent years ago, was the most recent years ago, the Bayay of the Bay."
+    },
+    {
+      "reference": " The San Francisco Police Department said the death was ruled a homicide and an investigation is ongoing.",
+      "hypothesis": " The fact that the Blancoholic and the Blancasus was the case, the President of the Fifthly, was the case, that the President of the Figue, the Blancasus and the Blancasus."
+    }
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 11.423162627239703,
+      "val_loss": 6.896637220089742,
+      "val_perplexity": 988.9437255859375,
+      "epoch_time_seconds": 430.33886528015137
+    },
+    {
+      "epoch": 2,
+      "train_loss": 5.4713314952275,
+      "val_loss": 6.619722679542149,
+      "val_perplexity": 749.7373046875,
+      "epoch_time_seconds": 430.4670641422272
+    },
+    {
+      "epoch": 3,
+      "train_loss": 5.208818844723186,
+      "val_loss": 6.414131488715454,
+      "val_perplexity": 610.4104614257812,
+      "epoch_time_seconds": 429.90998339653015
+    },
+    {
+      "epoch": 4,
+      "train_loss": 5.02388940364357,
+      "val_loss": 6.26116304574083,
+      "val_perplexity": 523.8279418945312,
+      "epoch_time_seconds": 429.70869541168213
+    },
+    {
+      "epoch": 5,
+      "train_loss": 4.8827618107746,
+      "val_loss": 6.164970950561266,
+      "val_perplexity": 475.78729248046875,
+      "epoch_time_seconds": 429.97143626213074
+    },
+    {
+      "epoch": 6,
+      "train_loss": 4.768207307429732,
+      "val_loss": 6.060528257515477,
+      "val_perplexity": 428.601806640625,
+      "epoch_time_seconds": 429.5986807346344
+    }
+  ],
+  "args": {
+    "data_dir": "data/processed_large",
+    "output_dir": "/content/drive/MyDrive/translation-transformer-runs/large",
+    "d_model": 512,
+    "num_heads": 8,
+    "num_layers": 4,
+    "d_ff": 1024,
+    "dropout": 0.1,
+    "max_len": 128,
+    "batch_size": 64,
+    "epochs": 6,
+    "warmup_steps": 400,
+    "label_smoothing": 0.1,
+    "grad_clip": 1.0,
+    "eval_max_batches": 50,
+    "bleu_samples": 200,
+    "device": "cuda",
+    "seed": 42,
+    "log_every": 100,
+    "num_examples_log": 5
+  }
+}

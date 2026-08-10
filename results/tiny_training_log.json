@@ -1,0 +1,109 @@
+{
+  "device": "cuda",
+  "num_parameters": 1171968,
+  "total_training_time_seconds": 58.31171941757202,
+  "best_val_loss": 5.909347384960779,
+  "best_val_perplexity": 368.4656677246094,
+  "test_bleu": 0.1406118232232635,
+  "sample_translations": [
+    {
+      "reference": " 28-Year-Old Chef Found Dead at San Francisco Mall",
+      "hypothesis": " The Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can, in the Can"
+    },
+    {
+      "reference": " A 28-year-old chef who had recently moved to San Francisco was found dead in the stairwell of a local mall this week.",
+      "hypothesis": " The next item is a new, the European Parliament, the European Parliament, in the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, in the European Parliament, in the European Parliament, the European Parliament, in the European Parliament, in the European Parliament"
+    },
+    {
+      "reference": " But the victim's brother says he can't think of anyone who would want to hurt him, saying, \"Things were finally going well for him.\"",
+      "hypothesis": " The first is the European Parliament, in the European Parliament, the European Parliament, in the European Parliament, in the European Parliament, the European Parliament, the European Parliament, the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament,"
+    },
+    {
+      "reference": " The body found at the Westfield Mall Wednesday morning was identified as 28-year-old San Francisco resident Frank Galicia, the San Francisco Medical Examiner's Office said.",
+      "hypothesis": " The next item is the European Parliament, the European Parliament, in the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament, in the European Parliament, in"
+    },
+    {
+      "reference": " The San Francisco Police Department said the death was ruled a homicide and an investigation is ongoing.",
+      "hypothesis": " The Cyprus, the Cyprus, the Cyprus, the Cyprus, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament, the European Parliament"
+    }
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 22.11399734665739,
+      "val_loss": 6.982370062784829,
+      "val_perplexity": 1077.4688720703125,
+      "epoch_time_seconds": 7.6602959632873535
+    },
+    {
+      "epoch": 2,
+      "train_loss": 6.444228277653216,
+      "val_loss": 6.701912098381328,
+      "val_perplexity": 813.9605712890625,
+      "epoch_time_seconds": 7.093424558639526
+    },
+    {
+      "epoch": 3,
+      "train_loss": 6.048504756654562,
+      "val_loss": 6.480228627721243,
+      "val_perplexity": 652.119873046875,
+      "epoch_time_seconds": 7.1819634437561035
+    },
+    {
+      "epoch": 4,
+      "train_loss": 5.740507801269522,
+      "val_loss": 6.289629537763517,
+      "val_perplexity": 538.95361328125,
+      "epoch_time_seconds": 7.140039682388306
+    },
+    {
+      "epoch": 5,
+      "train_loss": 5.480605297386875,
+      "val_loss": 6.120100233162604,
+      "val_perplexity": 454.9101867675781,
+      "epoch_time_seconds": 7.1908605098724365
+    },
+    {
+      "epoch": 6,
+      "train_loss": 5.30299966619305,
+      "val_loss": 6.035208583925677,
+      "val_perplexity": 417.8860168457031,
+      "epoch_time_seconds": 7.227390766143799
+    },
+    {
+      "epoch": 7,
+      "train_loss": 5.182320761366799,
+      "val_loss": 5.963579901628908,
+      "val_perplexity": 389.00030517578125,
+      "epoch_time_seconds": 7.176808834075928
+    },
+    {
+      "epoch": 8,
+      "train_loss": 5.095922814638023,
+      "val_loss": 5.909347384960779,
+      "val_perplexity": 368.4656677246094,
+      "epoch_time_seconds": 7.2280027866363525
+    }
+  ],
+  "args": {
+    "data_dir": "data/processed_tiny",
+    "output_dir": "/content/drive/MyDrive/translation-transformer-runs/tiny",
+    "d_model": 128,
+    "num_heads": 4,
+    "num_layers": 2,
+    "d_ff": 256,
+    "dropout": 0.1,
+    "max_len": 64,
+    "batch_size": 64,
+    "epochs": 8,
+    "warmup_steps": 200,
+    "label_smoothing": 0.1,
+    "grad_clip": 1.0,
+    "eval_max_batches": 50,
+    "bleu_samples": 200,
+    "device": "cuda",
+    "seed": 42,
+    "log_every": 100,
+    "num_examples_log": 5
+  }
+}
