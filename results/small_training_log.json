@@ -1,0 +1,123 @@
+{
+  "device": "cuda",
+  "num_parameters": 5993472,
+  "total_training_time_seconds": 647.0824077129364,
+  "best_val_loss": 5.946107435303104,
+  "best_val_perplexity": 382.262451171875,
+  "test_bleu": 0.19592707784808408,
+  "sample_translations": [
+    {
+      "reference": " 28-Year-Old Chef Found Dead at San Francisco Mall",
+      "hypothesis": " Are"
+    },
+    {
+      "reference": " A 28-year-old chef who had recently moved to San Francisco was found dead in the stairwell of a local mall this week.",
+      "hypothesis": " The fact that the Cube is the pathy of a paper."
+    },
+    {
+      "reference": " But the victim's brother says he can't think of anyone who would want to hurt him, saying, \"Things were finally going well for him.\"",
+      "hypothesis": " The ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '"
+    },
+    {
+      "reference": " The body found at the Westfield Mall Wednesday morning was identified as 28-year-old San Francisco resident Frank Galicia, the San Francisco Medical Examiner's Office said.",
+      "hypothesis": " The Compan, the CFPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+    },
+    {
+      "reference": " The San Francisco Police Department said the death was ruled a homicide and an investigation is ongoing.",
+      "hypothesis": " The fact that the Lom\u00e9 and the Culture, the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact that the fact"
+    }
+  ],
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 15.594440732309755,
+      "val_loss": 7.06322954547262,
+      "val_perplexity": 1168.2119140625,
+      "epoch_time_seconds": 65.42434573173523
+    },
+    {
+      "epoch": 2,
+      "train_loss": 6.130944430767674,
+      "val_loss": 6.783316832183541,
+      "val_perplexity": 882.992431640625,
+      "epoch_time_seconds": 64.4783866405487
+    },
+    {
+      "epoch": 3,
+      "train_loss": 5.831846084976446,
+      "val_loss": 6.617568289072208,
+      "val_perplexity": 748.1238403320312,
+      "epoch_time_seconds": 64.5898551940918
+    },
+    {
+      "epoch": 4,
+      "train_loss": 5.63471274302784,
+      "val_loss": 6.466870779374383,
+      "val_perplexity": 643.467041015625,
+      "epoch_time_seconds": 64.37101197242737
+    },
+    {
+      "epoch": 5,
+      "train_loss": 5.464521078651551,
+      "val_loss": 6.332256726301659,
+      "val_perplexity": 562.4244384765625,
+      "epoch_time_seconds": 64.53403353691101
+    },
+    {
+      "epoch": 6,
+      "train_loss": 5.316540831618125,
+      "val_loss": 6.204777144591995,
+      "val_perplexity": 495.108642578125,
+      "epoch_time_seconds": 64.21959495544434
+    },
+    {
+      "epoch": 7,
+      "train_loss": 5.2009098137661836,
+      "val_loss": 6.128560533856017,
+      "val_perplexity": 458.7752990722656,
+      "epoch_time_seconds": 64.4188117980957
+    },
+    {
+      "epoch": 8,
+      "train_loss": 5.108439910902597,
+      "val_loss": 6.050726327620691,
+      "val_perplexity": 424.4212341308594,
+      "epoch_time_seconds": 64.60450387001038
+    },
+    {
+      "epoch": 9,
+      "train_loss": 5.030993625217249,
+      "val_loss": 5.993027747202122,
+      "val_perplexity": 400.625732421875,
+      "epoch_time_seconds": 64.30823755264282
+    },
+    {
+      "epoch": 10,
+      "train_loss": 4.96502769305357,
+      "val_loss": 5.946107435303104,
+      "val_perplexity": 382.262451171875,
+      "epoch_time_seconds": 64.5322368144989
+    }
+  ],
+  "args": {
+    "data_dir": "data/processed",
+    "output_dir": "/content/drive/MyDrive/translation-transformer-runs/small",
+    "d_model": 256,
+    "num_heads": 4,
+    "num_layers": 3,
+    "d_ff": 512,
+    "dropout": 0.1,
+    "max_len": 128,
+    "batch_size": 64,
+    "epochs": 10,
+    "warmup_steps": 400,
+    "label_smoothing": 0.1,
+    "grad_clip": 1.0,
+    "eval_max_batches": 50,
+    "bleu_samples": 200,
+    "device": "cuda",
+    "seed": 42,
+    "log_every": 100,
+    "num_examples_log": 5
+  }
+}
