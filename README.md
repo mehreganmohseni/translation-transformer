@@ -92,6 +92,45 @@ loss/perplexity, timing, final BLEU, sample translations).
 python3 translate.py --checkpoint runs/small/best.pt --text "Guten Morgen, wie geht es Ihnen?"
 ```
 
+## Hardware requirements & reproducing the results
+
+- **Tiny** needs no GPU — it trains in under a minute even on a laptop CPU. This is the easiest
+  config to just run locally to confirm everything works end-to-end.
+- **Small** and **Large** are much faster with a GPU (minutes, vs. potentially hours on CPU alone).
+  If you don't have a local GPU, Google Colab provides one for free.
+
+### Running locally (any config)
+
+```bash
+pip install -r requirements.txt
+python3 data/prepare.py --num-train-examples 20000 --vocab-size 4000 --output-dir data/processed_tiny
+python3 train.py --data-dir data/processed_tiny --output-dir runs/tiny \
+  --d-model 128 --num-heads 4 --num-layers 2 --d-ff 256 --max-len 64 \
+  --epochs 8 --warmup-steps 200
+```
+`--device auto` (the default) picks CUDA/MPS/CPU automatically, so the same commands work
+unchanged on a GPU machine — just swap in the Small/Large flags from the Results table below.
+
+### Running on Google Colab (for Small/Large without a local GPU)
+
+1. New notebook at `colab.research.google.com` → `Runtime → Change runtime type → GPU`.
+2. Clone the repo and install the pinned dependency versions (matches what's actually verified
+   working — a newer/older `datasets`/`huggingface_hub` pairing can break dataset loading):
+   ```python
+   !git clone https://github.com/mehreganmohseni/translation-transformer.git
+   %cd translation-transformer
+   !pip install -q "datasets==4.5.0" "huggingface_hub==1.8.0" "tokenizers==0.22.2" sacrebleu
+   ```
+3. `Runtime → Restart session`, then `%cd /content/translation-transformer` again (imports/cwd
+   don't survive a restart, but the pinned installs do).
+4. Run data prep + training with `--device cuda`, e.g. for Small:
+   ```python
+   !python3 data/prepare.py --num-train-examples 100000 --output-dir data/processed
+   !python3 train.py --data-dir data/processed --output-dir runs/small --device cuda
+   ```
+5. (Optional) mount Google Drive first and point `--output-dir` at it if you want results to
+   survive a runtime disconnect — not needed just to verify a single run finishes successfully.
+
 ## Design notes
 
 - **From scratch**: both encoder self-attention and decoder self/cross-attention route through the
