@@ -97,7 +97,9 @@ python3 translate.py --checkpoint runs/small/best.pt --text "Guten Morgen, wie g
 - **Tiny** needs no GPU — it trains in under a minute even on a laptop CPU. This is the easiest
   config to just run locally to confirm everything works end-to-end.
 - **Small** and **Large** are much faster with a GPU (minutes, vs. potentially hours on CPU alone).
-  If you don't have a local GPU, Google Colab provides one for free.
+  If you don't have a local GPU, Google Colab's free tier gives you a T4, which is enough — the
+  results reported below were run on **Google Colab Pro with an NVIDIA A100** specifically, but
+  Small/Large will still complete on a free-tier T4, just slower.
 
 ### Running locally (any config)
 
