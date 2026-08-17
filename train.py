@@ -16,7 +16,7 @@ from modelling.transformer import Seq2SeqTransformer, greedy_decode
 
 class LabelSmoothingLoss(nn.Module):
 
-    """Label-smoothed NLL loss; avoids a CrossEntropyLoss crash on MPS in torch==2.0.1."""
+    """Label-smoothed NLL loss"""
 
     def __init__(self, pad_id: int, smoothing: float = 0.1):
         super().__init__()
