@@ -183,14 +183,17 @@ Three configurations were trained this way, from smallest to largest:
 | Parameters | 1,171,968 | 5,993,472 | 29,198,336 |
 | Training time | 58.3s | 10.8 min | 43.1 min |
 | Best val. loss | 5.909 | 5.946 | 6.061 |
-| Best val. perplexity | 368.5 | 382.3 | 428.6 |
+| `exp(validation loss)`* | 368.5 | 382.3 | 428.6 |
 | **Test BLEU** (sacrebleu, 200 sentences) | 0.14 | 0.20 | **1.13** |
 
 Full per-epoch histories, args, and 5 sample translations per run are in `results/*_training_log.json`.
 
-**Training is correct and stable**: validation loss decreases every single epoch in all three runs
-(e.g. Small: 7.06 → 5.95 over 10 epochs), with no divergence or instability, on all three model
-sizes.
+\* computed on the label-smoothed training loss, not standard unsmoothed-NLL perplexity — useful
+as a relative, within-run trend, not as a literature-comparable perplexity value.
+
+**Training remained stable across all three runs**: validation loss decreased every single epoch
+(e.g. Small: 7.06 → 5.95 over 10 epochs), with no divergence or instability observed on any of the
+three model sizes.
 
 **A note on comparing loss across configs**: raw validation loss/perplexity isn't directly
 comparable *between* the three runs, because each trained its own tokenizer with a different
@@ -201,9 +204,10 @@ the best-performing model. **BLEU is the metric that's actually comparable acros
 scores decoded text, not internal loss), and it improves monotonically with scale — Large's BLEU is
 ~8x Tiny's — which is the expected, correct direction.
 
-**Translation quality is intentionally poor**, consistent with the task's framing ("the focus is on
-demonstrating your programming skills rather than achieving high translation quality"). Sample
-outputs are often repetitive or incoherent, e.g. (Tiny run):
+**Translation quality remains limited under these deliberately resource-constrained experiments**
+(small models, small data subsets, greedy decoding, few epochs), consistent with the assignment's
+emphasis on implementation over competitive translation performance. Sample outputs are often
+repetitive or incoherent, e.g. (Tiny run):
 
 | Reference | Hypothesis |
 |---|---|
@@ -217,6 +221,9 @@ capacity/data genuinely helps), not the absolute translation quality.
 
 ## Known limitations / possible extensions
 
+- The training subset is the first N filtered sentence pairs from the streamed corpus, not a
+  random sample — this likely explains some domain concentration (e.g. parliamentary/EU
+  institutional vocabulary) visible in the sample outputs.
 - Greedy decoding only (no beam search) — leaves some BLEU on the table versus the paper's
   beam-4 setup.
 - No checkpoint averaging (the paper averages its last several checkpoints; this keeps only the

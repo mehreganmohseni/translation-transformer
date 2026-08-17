@@ -225,6 +225,9 @@ def main():
     total_time = time.time() - train_start
     print(f"Training finished in {total_time / 60:.1f} min")
 
+    best_checkpoint = torch.load(os.path.join(args.output_dir, "best.pt"), map_location=device)
+    model.load_state_dict(best_checkpoint["model_state"])
+
     test_tgt_text = [tokenizer.decode(ids) for ids in data["test"]["tgt"]]
     bleu_score, examples = evaluate_bleu(
         model, tokenizer, data["test"]["src"], test_tgt_text, device,

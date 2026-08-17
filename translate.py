@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import torch
 from tokenizers import Tokenizer
@@ -9,7 +10,7 @@ from modelling.transformer import Seq2SeqTransformer, greedy_decode
 def parse_args():
     parser = argparse.ArgumentParser(description="Translate German text with a trained checkpoint.")
     parser.add_argument("--checkpoint", type=str, required=True)
-    parser.add_argument("--tokenizer", type=str, default="data/processed/tokenizer.json")
+    parser.add_argument("--tokenizer", type=str, default=None, help="Defaults to the tokenizer.json in the checkpoint's own data_dir.")
     parser.add_argument("--text", type=str, required=True, help="German source sentence to translate.")
     parser.add_argument("--max-len", type=int, default=128)
     parser.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "mps", "cuda"])
@@ -34,7 +35,8 @@ def main():
     train_args = checkpoint["args"]
     data_config = checkpoint["data_config"]
 
-    tokenizer = Tokenizer.from_file(args.tokenizer)
+    tokenizer_path = args.tokenizer or os.path.join(train_args["data_dir"], "tokenizer.json")
+    tokenizer = Tokenizer.from_file(tokenizer_path)
 
     model = Seq2SeqTransformer(
         vocab_size=data_config["vocab_size"],
@@ -49,10 +51,11 @@ def main():
     model.load_state_dict(checkpoint["model_state"])
     model.eval()
 
-    src_ids = torch.tensor([tokenizer.encode(args.text).ids], dtype=torch.long, device=device)
+    max_len = min(args.max_len, train_args["max_len"])
+    encoded = tokenizer.encode(args.text).ids[:max_len]
+    src_ids = torch.tensor([encoded], dtype=torch.long, device=device)
     src_mask = torch.ones_like(src_ids)
 
-    max_len = min(args.max_len, train_args["max_len"])  
     ys = greedy_decode(
         model, src_ids, src_mask,
         data_config["bos_id"], data_config["eos_id"], max_len=max_len,

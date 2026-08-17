@@ -24,7 +24,6 @@ def parse_args():
     parser.add_argument("--max-words", type=int, default=100, help="Filter out sentences longer than this (whitespace-split words).")
     parser.add_argument("--min-words", type=int, default=1)
     parser.add_argument("--output-dir", type=str, default="data/processed")
-    parser.add_argument("--seed", type=int, default=42)
     return parser.parse_args()
 
 
