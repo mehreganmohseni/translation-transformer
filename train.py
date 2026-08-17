@@ -15,12 +15,8 @@ from modelling.transformer import Seq2SeqTransformer, greedy_decode
 
 
 class LabelSmoothingLoss(nn.Module):
-    """Label-smoothed NLL loss built from log_softmax/gather.
 
-    nn.CrossEntropyLoss (with or without label_smoothing) crashes with a
-    SIGBUS on the MPS backend in torch==2.0.1, so this avoids that kernel
-    entirely while giving the same result on CPU/CUDA.
-    """
+    """Label-smoothed NLL loss; avoids a CrossEntropyLoss crash on MPS in torch==2.0.1."""
 
     def __init__(self, pad_id: int, smoothing: float = 0.1):
         super().__init__()

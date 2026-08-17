@@ -52,7 +52,7 @@ def main():
     src_ids = torch.tensor([tokenizer.encode(args.text).ids], dtype=torch.long, device=device)
     src_mask = torch.ones_like(src_ids)
 
-    max_len = min(args.max_len, train_args["max_len"])  # can't exceed the trained positional-encoding table
+    max_len = min(args.max_len, train_args["max_len"])  
     ys = greedy_decode(
         model, src_ids, src_mask,
         data_config["bos_id"], data_config["eos_id"], max_len=max_len,

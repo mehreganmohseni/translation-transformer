@@ -5,7 +5,6 @@ import torch.nn as nn
 
 
 class Attention(nn.Module):
-    """Scaled dot-product attention, built from nn.Linear/nn.Softmax primitives."""
 
     def __init__(self, mask_future: bool = False):
         super().__init__()
@@ -33,7 +32,6 @@ class Attention(nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    """Multi-head attention built on top of the single-head Attention module."""
 
     def __init__(self, hidden_dim: int, num_heads: int, mask_future: bool = False):
         super().__init__()
@@ -54,7 +52,7 @@ class MultiHeadAttention(nn.Module):
     def _split_heads(self, x):
         batch, seq_len, _ = x.shape
         x = x.view(batch, seq_len, self.num_heads, self.head_dim)
-        return x.transpose(1, 2)  # (batch, num_heads, seq, head_dim)
+        return x.transpose(1, 2)
 
     def _merge_heads(self, x):
         batch, num_heads, seq_len, head_dim = x.shape

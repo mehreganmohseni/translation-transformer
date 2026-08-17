@@ -7,7 +7,8 @@ from modelling.attention import MultiHeadAttention
 
 
 class PositionalEncoding(nn.Module):
-    """Fixed sinusoidal positional encoding from "Attention Is All You Need"."""
+    
+    """Sinusoidal positional encoding"""
 
     def __init__(self, d_model: int, max_len: int = 512):
         super().__init__()
@@ -39,7 +40,8 @@ class FeedForward(nn.Module):
 
 
 class EncoderLayer(nn.Module):
-    """Pre-LN encoder block: more stable to train than the paper's post-LN at small scale."""
+
+    """Pre-LN encoder block."""
 
     def __init__(self, d_model: int, num_heads: int, d_ff: int, dropout: float):
         super().__init__()
@@ -130,7 +132,7 @@ class Seq2SeqTransformer(nn.Module):
         self.decoder = Decoder(d_model, num_heads, num_layers, d_ff, dropout)
 
         self.output_proj = nn.Linear(d_model, vocab_size, bias=False)
-        self.output_proj.weight = self.embedding.weight  # weight tying
+        self.output_proj.weight = self.embedding.weight  
 
     def _embed(self, ids):
         x = self.embedding(ids) * math.sqrt(self.d_model)

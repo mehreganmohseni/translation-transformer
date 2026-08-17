@@ -3,7 +3,8 @@ from torch.utils.data import Dataset
 
 
 class TranslationDataset(Dataset):
-    """Holds pre-tokenized (source, target) id sequences (no special tokens added yet)."""
+
+    """Holds pre-tokenized source/target id sequences."""
 
     def __init__(self, src_ids_list, tgt_ids_list):
         assert len(src_ids_list) == len(tgt_ids_list)
@@ -18,11 +19,12 @@ class TranslationDataset(Dataset):
 
 
 def make_collate_fn(pad_id: int, bos_id: int, eos_id: int, max_len: int = 128):
-    """Builds encoder inputs plus BOS-shifted decoder inputs/labels, with padding masks."""
+    
+    """Builds padded batches with BOS-shifted decoder inputs."""
 
     def collate(batch):
         src_batch = [ids[:max_len] for ids, _ in batch]
-        tgt_batch = [ids[: max_len - 1] for _, ids in batch]  # leave room for bos/eos
+        tgt_batch = [ids[: max_len - 1] for _, ids in batch] 
 
         src_len = max(len(ids) for ids in src_batch)
         dec_len = max(len(ids) for ids in tgt_batch) + 1
