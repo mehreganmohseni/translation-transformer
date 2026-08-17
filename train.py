@@ -35,7 +35,7 @@ class LabelSmoothingLoss(nn.Module):
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a small translation transformer on WMT17 de-en.")
     parser.add_argument("--data-dir", type=str, default="data/processed")
-    parser.add_argument("--output-dir", type=str, default="runs/exp1")
+    parser.add_argument("--output-dir", type=str, default="runs/output")
 
     parser.add_argument("--d-model", type=int, default=256)
     parser.add_argument("--num-heads", type=int, default=4)

@@ -1,25 +1,32 @@
 # Small Translation Transformer (WMT17 German → English)
 
 An encoder-decoder Transformer, following ["Attention Is All You Need"](https://arxiv.org/abs/1706.03762),
-implemented from scratch (attention, multi-head attention, encoder/decoder stacks) and trained on a subset
-of WMT17 German→English.
+with the attention mechanism implemented from scratch and unit-tested, and a complete CLI-driven
+pipeline for training it on a subset of WMT17 German→English.
 
-The attention mechanism (`modelling/attention.py`) is unit-tested against fixed expected outputs — see
-`test_attention.py` / `test_mha.py`. The rest of the model (`modelling/transformer.py`) is built on top of
-those two classes.
+This covers both parts of the task:
+
+1. **Attention / multi-head attention from scratch** (`modelling/attention.py`), built only from
+   `nn.Linear`, `nn.Softmax`, and tensor ops — no `nn.MultiheadAttention` or
+   `F.scaled_dot_product_attention`. Verified against the provided pytest suite
+   (`test_attention.py`, `test_mha.py`).
+2. **A full translation-transformer training project** (`modelling/transformer.py`, `data/`,
+   `train.py`, `translate.py`) built on top of those two classes, trained on real WMT17 de-en data,
+   with results from three different model-size/data-subset configurations reported below.
 
 ## Project layout
 
 ```
 modelling/
-  attention.py     Attention, MultiHeadAttention (from scratch)
-  transformer.py    Seq2SeqTransformer, encoder/decoder stacks, greedy_decode
+  attention.py     Attention, MultiHeadAttention (from scratch, pytest-verified)
+  transformer.py   Seq2SeqTransformer, encoder/decoder stacks, greedy_decode
 data/
-  prepare.py         Streams a WMT17 de-en subset, trains a BPE tokenizer, caches tokenized tensors
-  dataset.py         TranslationDataset + batch collation (padding, BOS/EOS shifting)
-train.py              Training CLI
-translate.py          Inference CLI (translate one sentence with a trained checkpoint)
+  prepare.py       Streams a WMT17 de-en subset, trains a BPE tokenizer, caches tokenized tensors
+  dataset.py       TranslationDataset + batch collation (padding, BOS/EOS shifting)
+train.py            Training CLI
+translate.py        Inference CLI (translate one sentence with a trained checkpoint)
 test_attention.py, test_mha.py   Subtask 1 pytest suite
+results/            training_log.json for each reported run (tiny / small / large)
 ```
 
 ## Setup
@@ -28,19 +35,25 @@ test_attention.py, test_mha.py   Subtask 1 pytest suite
 pip install -r requirements.txt
 ```
 
-Requires Python 3.9+, PyTorch 2.0+. Tested on macOS/Apple Silicon (MPS) and CPU.
+Requires Python 3.9+, PyTorch 2.0+. Runs on CPU, Apple Silicon (MPS), or CUDA — `--device auto`
+(the default) picks the best available automatically.
 
-## 1. Verify the attention implementation
+## Part 1 — Verify the attention implementation
 
 ```bash
 python3 -m pytest test_attention.py test_mha.py -v
 ```
 
-## 2. Prepare data
+All 6 cases (self-attention, causal-masked self-attention, cross-attention — for both `Attention`
+and `MultiHeadAttention`) pass, checked against the fixed expected-output tensors provided.
 
-Streams WMT17 de-en from Hugging Face (no full-dataset download — only the requested number of
-examples are pulled), filters degenerate/overlong sentence pairs, trains a shared byte-level BPE
-tokenizer, and caches everything to `data/processed/`.
+## Part 2 — Train a translation model
+
+### 1. Prepare data
+
+Streams WMT17 de-en from Hugging Face (only the requested number of examples are pulled, not the
+full ~5.9M-pair corpus), filters degenerate/overlong sentence pairs, trains a shared byte-level BPE
+tokenizer, and caches everything.
 
 ```bash
 python3 data/prepare.py \
@@ -51,63 +64,121 @@ python3 data/prepare.py \
   --output-dir data/processed
 ```
 
-Validation uses WMT17's real `validation` split, test uses the real `test` split — both held out from
-training, so reported numbers are genuine, not self-selected.
+Validation and test use WMT17's real `validation`/`test` splits — held out from training, so
+reported numbers are genuine, not self-selected.
 
-## 3. Train
+### 2. Train
 
 ```bash
 python3 train.py \
   --data-dir data/processed \
-  --output-dir runs/exp1 \
+  --output-dir runs/small \
   --d-model 256 --num-heads 4 --num-layers 3 --d-ff 512 \
   --batch-size 64 --epochs 10 --warmup-steps 400
 ```
 
 Key flags:
-- `--device {auto,cpu,mps,cuda}` — defaults to `auto` (prefers CUDA, then Apple MPS, then CPU).
+- `--device {auto,cpu,mps,cuda}` — defaults to `auto`.
 - `--bleu-samples N` — number of test sentences to greedy-decode and score with `sacrebleu` after
-  training (0 disables). Kept small by default since decoding is the slow part.
+  training (0 disables).
 - `--eval-max-batches N` — caps per-epoch validation to N batches, to keep epoch time predictable.
 
-Outputs in `--output-dir`:
-- `best.pt` / `last.pt` — checkpoints (model weights + the args/config needed to rebuild the model).
-- `training_log.json` — per-epoch train/val loss & perplexity, timing, final BLEU, and sample
-  translations, used to fill in the Results section below.
+Outputs in `--output-dir`: `best.pt` / `last.pt` checkpoints, and `training_log.json` (per-epoch
+loss/perplexity, timing, final BLEU, sample translations).
 
-## 4. Translate a sentence
+### 3. Translate a sentence
 
 ```bash
-python3 translate.py --checkpoint runs/exp1/best.pt --text "Guten Morgen, wie geht es Ihnen?"
+python3 translate.py --checkpoint runs/small/best.pt --text "Guten Morgen, wie geht es Ihnen?"
 ```
 
 ## Design notes
 
-- **From scratch**: `Attention` and `MultiHeadAttention` are built only from `nn.Linear`, `nn.Softmax`,
-  and tensor ops — no `nn.MultiheadAttention` / `F.scaled_dot_product_attention`. `Seq2SeqTransformer`
-  is built on top of those two classes (both encoder self-attention and decoder self/cross-attention
-  route through `MultiHeadAttention`).
-- **Pre-LN** (`x + Sublayer(LayerNorm(x))`) is used instead of the paper's post-LN — it trains more
-  stably without needing the paper's more delicate warmup tuning, which matters for a short run on
-  modest hardware. This is a deliberate, minor deviation from the paper.
-- **Shared tokenizer**: one byte-level BPE vocabulary across German and English, with the encoder/decoder
-  embedding and the output projection weight-tied — keeps parameter count and vocabulary handling simple.
-- **MPS note**: `nn.CrossEntropyLoss` (with or without `label_smoothing`) crashes with a SIGBUS on the
-  PyTorch MPS backend in `torch==2.0.1`. `train.py` uses a manual `LabelSmoothingLoss` (log_softmax +
-  gather) instead, which is numerically equivalent and MPS-safe.
-- **Scale**: model size and data subset are deliberately small (see Results below) — the goal is a
-  correct, debuggable, end-to-end pipeline, not competitive translation quality. For reference, the
-  original paper's smallest ("base") model trained for 12 hours on 8 P100 GPUs over the full ~4.5M-pair
-  WMT14 corpus.
+- **From scratch**: both encoder self-attention and decoder self/cross-attention route through the
+  same `MultiHeadAttention` class from Part 1 — the training pipeline isn't a separate reimplementation.
+- **Pre-LN** (`x + Sublayer(LayerNorm(x))`) is used instead of the paper's post-LN — trains more
+  stably without the paper's more delicate warmup tuning, which matters for a short run on modest
+  hardware. This is the one deliberate deviation from the paper; everything else (Adam with
+  `betas=(0.9,0.98), eps=1e-9`, the Noam learning-rate schedule, label smoothing = 0.1, sinusoidal
+  positional encoding, weight tying) matches it directly.
+- **Shared tokenizer**: one byte-level BPE vocabulary across German and English, with the
+  encoder/decoder embedding and output projection weight-tied.
+- **MPS note**: `nn.CrossEntropyLoss` (with or without `label_smoothing`) crashes with a SIGBUS on
+  the PyTorch MPS backend in `torch==2.0.1`. `train.py` uses a manual `LabelSmoothingLoss`
+  (log_softmax + gather) instead — numerically equivalent, and safe on CPU/MPS/CUDA.
+- **Scale**: model size and data subset are deliberately small (see Results) — the goal is a
+  correct, debuggable, end-to-end pipeline, not competitive translation quality. The original
+  paper's smallest ("base") model trained for 12 hours on 8 P100 GPUs over the full ~4.5M-pair
+  WMT14 corpus; the configs below train in seconds to tens of minutes on a single GPU.
 
 ## Results
 
-_To be filled in after the real training run (see `runs/exp1/training_log.json`):_
+### Training environment
 
-- Model size / data subset used:
-- Number of parameters:
-- Hardware / device:
-- Total training time:
-- Final train loss / validation loss / validation perplexity:
-- Test BLEU (sacrebleu) on N held-out sentences:
-- Sample translations (source / reference / model output):
+All three runs below were trained end-to-end (data prep → training → held-out evaluation) on
+**Google Colab Pro, on an NVIDIA A100 GPU** (`--device cuda`), following this workflow:
+
+1. Clone this repository into the Colab runtime and install the extra dependencies not already
+   bundled with Colab's PyTorch image (`datasets`, `tokenizers`, `sacrebleu`).
+2. Mount Google Drive, so checkpoints/logs survive a runtime disconnect (Colab's local disk is
+   wiped when a session ends).
+3. Run `data/prepare.py` for the chosen config directly on Colab (data streams straight from
+   Hugging Face — nothing needs to be uploaded manually).
+4. Run `train.py` with `--device cuda` and `--output-dir` pointed at the mounted Drive folder.
+5. Copy the resulting `training_log.json` into the cloned repo and `git push` it back to GitHub
+   directly from the Colab session — this is how the three files under `results/` got here.
+
+Repeating this for Tiny/Small/Large just means re-running steps 3–5 with each config's flags (see
+the table below).
+
+Three configurations were trained this way, from smallest to largest:
+
+| | Tiny | Small | Large |
+|---|---|---|---|
+| `d_model` / heads / layers / `d_ff` | 128 / 4 / 2 / 256 | 256 / 4 / 3 / 512 | 512 / 8 / 4 / 1024 |
+| Vocab size | 4,000 | 8,000 | 16,000 |
+| Training pairs | 20,000 | 100,000 | 300,000 |
+| Epochs | 8 | 10 | 6 |
+| Parameters | 1,171,968 | 5,993,472 | 29,198,336 |
+| Training time | 58.3s | 10.8 min | 43.1 min |
+| Best val. loss | 5.909 | 5.946 | 6.061 |
+| Best val. perplexity | 368.5 | 382.3 | 428.6 |
+| **Test BLEU** (sacrebleu, 200 sentences) | 0.14 | 0.20 | **1.13** |
+
+Full per-epoch histories, args, and 5 sample translations per run are in `results/*_training_log.json`.
+
+**Training is correct and stable**: validation loss decreases every single epoch in all three runs
+(e.g. Small: 7.06 → 5.95 over 10 epochs), with no divergence or instability, on all three model
+sizes.
+
+**A note on comparing loss across configs**: raw validation loss/perplexity isn't directly
+comparable *between* the three runs, because each trained its own tokenizer with a different
+vocabulary size (4k/8k/16k). The label-smoothing loss averages log-probabilities uniformly across
+the *entire* vocabulary as its smoothing term, so a larger vocabulary mechanically raises the loss
+floor regardless of translation quality — this is why Large shows the *highest* loss despite being
+the best-performing model. **BLEU is the metric that's actually comparable across configs** (it
+scores decoded text, not internal loss), and it improves monotonically with scale — Large's BLEU is
+~8x Tiny's — which is the expected, correct direction.
+
+**Translation quality is intentionally poor**, consistent with the task's framing ("the focus is on
+demonstrating your programming skills rather than achieving high translation quality"). Sample
+outputs are often repetitive or incoherent, e.g. (Tiny run):
+
+| Reference | Hypothesis |
+|---|---|
+| "28-Year-Old Chef Found Dead at San Francisco Mall" | "The Can, in the Can, in the Can, in the Can, ..." |
+
+This is the expected failure mode for a model this small trained this briefly on this little data —
+greedy decoding with no beam search, a few thousand optimizer steps, and tens of thousands of
+sentence pairs are far below what's needed for fluent output. The meaningful signals are the
+monotonic loss decrease (the pipeline learns correctly) and BLEU improving with scale (more
+capacity/data genuinely helps), not the absolute translation quality.
+
+## Known limitations / possible extensions
+
+- Greedy decoding only (no beam search) — leaves some BLEU on the table versus the paper's
+  beam-4 setup.
+- No checkpoint averaging (the paper averages its last several checkpoints; this keeps only the
+  single best-validation-loss checkpoint).
+- Fixed batch size by sentence count, not token count (the paper batches by ~25k tokens with
+  length bucketing).
